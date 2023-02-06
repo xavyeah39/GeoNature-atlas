@@ -7,7 +7,11 @@
 # Connexion de l'application à la BDD
 # Remplacer user, monpassachanger, IPADRESSE (localhost si la BDD est sur le même serveur que l'application), 
 # eventuellement le port de la BDD et le nom de la BDD avec l'utilisateur qui a des droits de lecture sur les vues de l'atlas (user_pg dans settings.ini)
-database_connection = "postgresql://user:monpassachanger@IPADRESSE:5432/databaseName"
+user_pg = "user"
+user_pg_pass = "monpassachanger"
+db_host = "IPADRESSE"
+db_port = "5432"
+db_name = "geonatureatlas"
 
 # Recharger automatiquement les templates
 TEMPLATES_AUTO_RELOAD = False

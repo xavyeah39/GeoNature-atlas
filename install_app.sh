@@ -55,7 +55,11 @@ if [ ! -f ./atlas/configuration/config.py ]; then
   cp ./atlas/configuration/config.py.sample ./atlas/configuration/config.py
 fi
 
-sudo sed -i "s/database_connection = .*$/database_connection = \"postgresql:\/\/$user_pg:$user_pg_pass@$db_host:$db_port\/$db_name\"/" ./atlas/configuration/config.py
+sed -i "s/user_pg = .*$/user_pg = '${user_pg}'/g" ./atlas/configuration/config.py
+sed -i "s/user_pg_pass = .*$/user_pg_pass = '${user_pg_pass}'/g" ./atlas/configuration/config.py
+sed -i "s/db_host = .*$/db_host = '${db_host}'/g" ./atlas/configuration/config.py
+sed -i "s/db_port = .*$/db_port = '${db_port}'/g" ./atlas/configuration/config.py
+sed -i "s/db_name = .*$/db_name = '${db_name}'/g" ./atlas/configuration/config.py
 sed -i "s/GUNICORN_PORT = .*$/GUNICORN_PORT = '${gun_port}'/g" ./atlas/configuration/config.py
 
 

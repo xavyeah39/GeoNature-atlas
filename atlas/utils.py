@@ -3,11 +3,19 @@
 from sqlalchemy import MetaData
 from sqlalchemy import create_engine
 from sqlalchemy.pool import QueuePool
+from urllib import parse
+from atlas.configuration.config import user_pg, user_pg_pass, db_host, db_port, db_name, NOM_APPLICATION
 
 from atlas.configuration.config import database_connection, NOM_APPLICATION
 
 engine = create_engine(
-    database_connection,
+    'postgresql://{user}:{password}@{host}:{port}/{database}'.format(
+        user=user_pg,
+        password=parse.quote(user_pg_pass),
+        host=db_host,
+        port=db_port,
+        database=db_name,
+    ),
     client_encoding="utf8",
     echo=False,
     poolclass=QueuePool,
