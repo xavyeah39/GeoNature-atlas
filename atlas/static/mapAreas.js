@@ -17,7 +17,8 @@ var areaLayer = L.geoJson(areaInfos.areaGeoJson, {
             weight: 2,
             color: areaBorderColor,
             // dashArray: "3",
-            fillOpacity: 0.3
+            fillOpacity: 0.3,
+            invert: true
         };
     }
 }).addTo(map);

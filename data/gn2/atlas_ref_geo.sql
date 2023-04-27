@@ -17,6 +17,7 @@ WITH d AS (
 	FROM ref_geo.l_areas l
 	JOIN ref_geo.bib_areas_types b USING(id_type)
 	WHERE REPLACE(b.type_code, ' ', '_') = :type_territoire
+  AND l.enable IS TRUE
 	GROUP BY b.type_name
 )
 SELECT

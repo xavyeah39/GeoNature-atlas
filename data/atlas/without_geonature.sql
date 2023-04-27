@@ -10,7 +10,7 @@ CREATE TABLE synthese.syntheseff(
     supprime boolean DEFAULT false,
     the_geom_point geometry('POINT',4326),
     effectif_total integer,
-    diffusion_level integer
+    sensitivity integer
 );
 
 INSERT INTO synthese.syntheseff

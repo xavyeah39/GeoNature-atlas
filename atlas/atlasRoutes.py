@@ -261,7 +261,7 @@ def ficheEspece(cd_nom):
         communes = vmCommunesRepository.getCommunesObservationsChildsMailles(connection, cd_ref)
     else:
         communes = vmCommunesRepository.getCommunesObservationsChilds(connection, cd_ref)
-    taxonomyHierarchy = vmTaxrefRepository.getAllTaxonomy(session, cd_ref)
+    taxonomyHierarchy = vmTaxrefRepository.getAllTaxonomy(db_session, cd_ref)
     firstPhoto = vmMedias.getFirstPhoto(
         connection, cd_ref, current_app.config["ATTR_MAIN_PHOTO"]
     )
