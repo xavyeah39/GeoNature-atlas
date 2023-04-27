@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-
+from collections import Counter
 from flask import current_app
 from sqlalchemy.sql import text
 

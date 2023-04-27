@@ -46,6 +46,7 @@ class VmObservationsMailles(Base):
         metadata,
         Column("id_observation", Integer, primary_key=True, unique=True),
         Column("id_maille", Integer),
+        Column("type_code", Integer),
         Column("the_geom", Geometry),
         Column("geojson_maille", Text),
         Column("annee", String(1000)),

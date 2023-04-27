@@ -257,8 +257,11 @@ def ficheEspece(cd_nom):
     altitudes = vmAltitudesRepository.getAltitudesChilds(connection, cd_ref)
     months = vmMoisRepository.getMonthlyObservationsChilds(connection, cd_ref)
     synonyme = vmTaxrefRepository.getSynonymy(connection, cd_ref)
-    communes = vmCommunesRepository.getCommunesObservationsChilds(connection, cd_ref)
-    taxonomyHierarchy = vmTaxrefRepository.getAllTaxonomy(db_session, cd_ref)
+    if current_app.config["AFFICHAGE_MAILLE"]:
+        communes = vmCommunesRepository.getCommunesObservationsChildsMailles(connection, cd_ref)
+    else:
+        communes = vmCommunesRepository.getCommunesObservationsChilds(connection, cd_ref)
+    taxonomyHierarchy = vmTaxrefRepository.getAllTaxonomy(session, cd_ref)
     firstPhoto = vmMedias.getFirstPhoto(
         connection, cd_ref, current_app.config["ATTR_MAIN_PHOTO"]
     )
@@ -321,7 +324,7 @@ def ficheCommune(insee):
     session = utils.loadSession()
     connection = utils.engine.connect()
 
-    listTaxons = vmTaxonsRepository.getTaxonsCommunes(connection, insee)
+    
     commune = vmCommunesRepository.getCommuneFromInsee(connection, insee)
     if current_app.config["AFFICHAGE_MAILLE"]:
         observations = vmObservationsMaillesRepository.lastObservationsCommuneMaille(
@@ -331,6 +334,8 @@ def ficheCommune(insee):
         observations = vmObservationsRepository.lastObservationsCommune(
             connection, current_app.config["NB_LAST_OBS"], insee
         )
+    
+    listTaxons = vmTaxonsRepository.getTaxonsCommunes(connection, insee)
 
     surroundingAreas = []
 

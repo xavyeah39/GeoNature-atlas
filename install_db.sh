@@ -349,6 +349,15 @@ if ! database_exists $db_name
 
         sudo sed -i "s/INSERT_ALTITUDE/${insert}/" /tmp/atlas/4.atlas.vm_altitudes.sql
 
+        # FR: Création de la vue matérialisée vm_cor_area_synthese (table de correspondance entre zones et observations de la synthèse)
+        # EN: Creation of the materialized view vm_cor_area_synthese (relations between areas and synthesis observations)
+        echo "[$(date +'%H:%M:%S')] Creating atlas.vm_cor_area_synthese..."
+        time_temp=$SECONDS
+        export PGPASSWORD=$owner_atlas_pass;psql -d $db_name -U $owner_atlas -h $db_host \
+        -f /tmp/atlas/0.atlas.vm_cor_area_synthese.sql \
+        -v default_maille=$type_maille  &>> log/install_db.log
+        echo "[$(date +'%H:%M:%S')] Passed - Duration : $((($SECONDS-$time_temp)/60))m$((($SECONDS-$time_temp)%60))s"
+
         echo "[$(date +'%H:%M:%S')] Creating atlas.vm_taxref..."
         time_temp=$SECONDS
         export PGPASSWORD=$owner_atlas_pass;psql -d $db_name -U $owner_atlas -h $db_host -f /tmp/atlas/1.atlas.vm_taxref.sql  &>> log/install_db.log

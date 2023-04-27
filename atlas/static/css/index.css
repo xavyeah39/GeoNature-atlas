@@ -344,7 +344,7 @@ h3.title-spaced {
   width: 80px;
   height: 40px;
   background-position: center;
-  align: center;
+  text-align: center;
   object-fit: contain;
 }
 
@@ -358,6 +358,14 @@ h3.title-spaced {
 
 .lastObslistItem.current {
   background-color: #e6e6e6;
+}
+
+.tabEspece:hover {
+  background-color: rgba(var(--main-color-rgb), 0.2);
+}
+
+.tabEspece.current {
+  background-color: rgba(var(--main-color-rgb), 0.4);
   font-weight: bold;
 }
 

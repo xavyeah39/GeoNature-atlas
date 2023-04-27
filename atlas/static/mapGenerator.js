@@ -43,6 +43,35 @@ function generateMap(zoomHomeButton) {
     zoomControl: !(zoomHomeButton),
   });
 
+  // department = L.featureGroup();
+  // cities = L.featureGroup();
+  // tenCell = L.featureGroup();
+
+  m10FeatureGroup = L.featureGroup();
+  m5FeatureGroup = L.featureGroup();
+  m1FeatureGroup = L.featureGroup();
+
+  var overlays = {
+    "Maille 10": m10FeatureGroup,
+    "Maille 5": m5FeatureGroup,
+    "Maille 1": m1FeatureGroup,
+  };
+  // Add layers
+  control = L.control.layers(null, overlays);
+
+  if (configuration.AFFICHAGE_MAILLE) {
+    control.addTo(map);
+  }
+  // Activate layers
+  Object.values(overlays).forEach((e) => map.addLayer(e));
+
+  // Keep Layers in the same order as specified by the
+  // overlays variable so Departement under Commune
+  // under 10km2 under 1km2
+  map.on("overlayadd", function (e) {
+    Object.values(overlays).forEach((e) => e.bringToFront());
+  });
+
   if (zoomHomeButton) {
     var zoomHome = L.Control.zoomHome();
     zoomHome.addTo(map);
@@ -177,6 +206,10 @@ function onEachFeatureMaille(feature, layer) {
     feature.properties.last_observation +
     " ";
   layer.bindPopup(popupContent);
+
+  filterMaille(feature, layer);
+
+  zoomMaille(layer);
 }
 
 // Style maille
@@ -205,6 +238,18 @@ function styleMaille(feature) {
     color: mailleBorderColor,
     fillOpacity: 0.8,
   };
+}
+
+function zoomMaille(layer) {
+  layer.on("click", function (e) {
+    bounds = e.sourceTarget.feature.geometry.coordinates;
+    bounds = bounds.map((b) => {
+      return b.map((c) => {
+        return c.map((d) => [d[1], d[0]]);
+      });
+    });
+    map.fitBounds(bounds);
+  });
 }
 
 function generateLegendMaille() {
@@ -279,6 +324,7 @@ function generateGeojsonMaille(observations, yearMin, yearMax) {
 
 function displayMailleLayerFicheEspece(observationsMaille) {
   myGeoJson = observationsMaille;
+
   currentLayer = L.geoJson(myGeoJson, {
     onEachFeature: onEachFeatureMaille,
     style: styleMaille,
@@ -297,7 +343,9 @@ function generateGeojsonGridArea(observations) {
   while (i < observations.length) {
     geometry = observations[i].geojson_maille;
     idMaille = observations[i].id_maille;
+    typeCode = observations[i].type_code;
     properties = {
+      type_code: typeCode,
       id_maille: idMaille,
       nb_observations: 1,
       last_observation: observations[i].annee,
@@ -488,7 +536,6 @@ function displayMarkerLayerPointLastObs(observationsPoint) {
       );
     },
   });
-
   map.addLayer(currentLayer);
   if (typeof divLegendeFicheCommuneHome !== "undefined") {
     legend.onAdd = function (map) {
@@ -556,12 +603,38 @@ function printEspece(tabEspece, tabCdRef) {
 }
 
 function onEachFeatureMailleLastObs(feature, layer) {
+  // "Set" removes the duplicates. We do not want the same
+  // species in the popup => Clearer
   popupContent =
     "<b>Espèces observées dans la maille: </b> <ul> " +
-    printEspece(feature.properties.list_taxon, feature.properties.list_cdref) +
+    printEspece(
+      [...new Set(feature.properties.list_taxon)],
+      [...new Set(feature.properties.list_cdref)]
+    ) +
     "</ul>";
-
   layer.bindPopup(popupContent);
+
+  filterMaille(feature, layer);
+
+  zoomMaille(layer);
+
+  var selected = false;
+
+  layer.on("click", function (layer) {
+    resetStyleMailles();
+    this.setStyle(styleMailleClickedOrHover(layer.target));
+    selected = true;
+  });
+  layer.on("mouseover", function (layer) {
+    this.setStyle(styleMailleClickedOrHover(layer.target));
+    selected = false;
+  });
+
+  layer.on("mouseout", function () {
+    if (!selected) {
+      this.setStyle(styleMailleLastObs());
+    }
+  });
 }
 
 function styleMailleLastObs() {
@@ -570,7 +643,54 @@ function styleMailleLastObs() {
     weight: 2,
     color: mailleLastObsBorderColor,
     fillOpacity: 0,
+    color: "#333333",
+    fillOpacity: 0,
   };
+}
+
+function styleMailleClickedOrHover(layer) {
+  var mailleCode = layer.feature.properties.type_code;
+  var fillColor = getComputedStyle(document.body).getPropertyValue(
+    "--main-color"
+  );
+  var fillOpacity = 0.5;
+
+  if (mailleCode === "M1") {
+    var fillOpacity = 0.2;
+  } else if (mailleCode === "M5") {
+    var fillOpacity = 0.4;
+  } else if (mailleCode === "M10") {
+    var fillOpacity = 0.6;
+  } else {
+    var fillOpacity = 0.85;
+  }
+  var options = layer.options;
+  return {
+    ...options,
+    fillColor: fillColor,
+    fillOpacity: fillOpacity,
+  };
+}
+
+function resetStyleMailles() {
+  // set style for all cells
+  map.eachLayer(function (layer) {
+    if (layer.feature && layer.feature.properties.id_type) {
+      layer.setStyle(styleMailleLastObs());
+    }
+  });
+}
+
+function filterMaille(feature, layer) {
+  mailleTypeCode = feature.properties.type_code;
+  if (mailleTypeCode === "M10") {
+    m10FeatureGroup.addLayer(layer);
+    m10FeatureGroup.bringToBack();
+  } else if (mailleTypeCode === "M5") {
+    m5FeatureGroup.addLayer(layer);
+  } else if (mailleTypeCode === "M1") {
+    m1FeatureGroup.addLayer(layer);
+  }
 }
 
 function generateGeoJsonMailleLastObs(observations) {
@@ -580,6 +700,7 @@ function generateGeoJsonMailleLastObs(observations) {
     geometry = observations[i].geojson_maille;
     idMaille = observations[i].id_maille;
     properties = {
+      id_type: observations[i].id_type,
       id_maille: idMaille,
       list_taxon: [observations[i].taxon],
       list_cdref: [observations[i].cd_ref],
@@ -618,6 +739,8 @@ function displayMailleLayerLastObs(observations) {
     onEachFeature: onEachFeatureMailleLastObs,
     style: styleMailleLastObs,
   });
+  // Very important otherwise currentLayer cannot be removed by
+  // mapCommune.js
   currentLayer.addTo(map);
   //map.fitBounds(currentLayer.getBounds()); ZOOM ON LAST OBS MAILLE
 }

@@ -29,8 +29,8 @@ $(function(){
         for (var key in p) {
           if (find_id_observation_in_array(p[key].feature.properties.list_id_observation, id_observation) ){
               selectLayer = p[key];
-          }
         }
+      }
 
         selectLayer.openPopup();
         var bounds = L.latLngBounds();
@@ -39,7 +39,7 @@ $(function(){
         map.fitBounds(bounds, {
           maxZoom : 12
         });
-      });
+    });
   }
 
   // Display point layer
@@ -59,19 +59,26 @@ $(function(){
             selectLayer = p[key];
           }
       }
-      selectLayer.openPopup();
-          map.setView(selectLayer._latlng, 14);
+      selectLayer.openPopup(selectLayer._latlng);
+      map.setView(selectLayer._latlng, 14);
       })
   }
 
 
 // Zoom on the popup on observation click
 
-  currentLayer.on('click', function(e){
-    if (map.getZoom()<14) {
-      map.setView(e.latlng, 14);
-    }
-  });
+  // currentLayer.on('click', function(e){
+  //   console.log(e.layer.feature);
+  //   bounds = e.layer.feature.geometry.coordinates;
+  //   bounds = bounds.map(b => {
+  //     return b.map(c => {
+  //       return c.map(d => [d[1], d[0]])
+  //     })
+  //   })
+  //   map.fitBounds(bounds, {"duration": 1});
+  //   //map.setView(e.latlng, 8);
+    
+  // });
 
 
 });
