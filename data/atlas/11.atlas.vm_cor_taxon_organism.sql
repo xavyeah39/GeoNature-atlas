@@ -25,3 +25,8 @@ AS SELECT DISTINCT id_dataset, id_organism
    	join utilisateurs.bib_organismes bo on bo.id_organisme = obs_by_dataset_and_orga.id_organism
     group by obs_by_dataset_and_orga.cd_ref, bo.id_organisme, bo.nom_organisme, bo.adresse_organisme, bo.cp_organisme, bo.ville_organisme, 
     bo.tel_organisme, bo.email_organisme, bo.url_organisme, bo.url_logo;
+
+    CREATE UNIQUE INDEX ON atlas.vm_cor_taxon_organism (cd_ref, id_organism);
+    CREATE INDEX ON atlas.vm_cor_taxon_organism USING btree(cd_ref);
+    CREATE INDEX ON atlas.vm_cor_taxon_organism USING btree(id_organism);
+    CREATE INDEX ON atlas.vm_cor_taxon_organism USING btree(nom_organism);

@@ -29,7 +29,7 @@ class VmObservations(Base):
         Column("cd_ref", Integer, index=True),
         Column("the_geom_point", Geometry(geometry_type="POINT", srid=4326)),
         Column("geojson_point", Text),
-        Column("diffusion_level"),
+        Column("cd_sensitivity", Integer),
         schema="atlas",
         autoload=True,
         autoload_with=engine,
