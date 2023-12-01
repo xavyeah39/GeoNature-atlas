@@ -173,6 +173,12 @@ function generateMap(zoomHomeButton) {
   return map;
 }
 
+function observersTxt(feature) {
+  return configuration.DISPLAY_OBSERVERS
+    ? `</br><b> Observateurs(s): </b> ${feature.properties.observateurs}`
+    : ""
+}
+
 //****** Fonction fiche espècce ***********
 
 // Popup Point
