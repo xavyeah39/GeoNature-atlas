@@ -312,10 +312,14 @@ def getLastDiscoveries(connection):
     req = connection.execute(text(sql), thisidtype=current_app.config["ATTR_MAIN_PHOTO"])
     lastDiscoveriesList= list()
     for r in req :
+        shorterName = None
+        if r.nom_vern != None:
+            shorterName = r.nom_vern.split(",")
+            shorterName = shorterName[0]
         temp = {
             'date':r.date,
             'cd_ref':r.cd_ref,
-            'nom_vern':r.nom_vern,
+            'nom_vern':shorterName,
             'lb_nom':r.lb_nom,
             'id_media':r.id_media,
             'group2_inpn': utils.deleteAccent(r.group2_inpn),
